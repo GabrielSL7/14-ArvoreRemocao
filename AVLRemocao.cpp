@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <cstdlib> // Para system("cls") e malloc/free
+#include <cstdlib>
 
 using namespace std;
 
@@ -107,8 +107,7 @@ void remover() {
     cout << "Digite o elemento a ser removido: ";
     cin >> v;
 
-    // --- Lógica de verificação para melhor feedback ---
-    // Buscar o elemento para saber se ele existe antes de chamar a remoção recursiva
+    // Lógica de verificação para melhor feedback
     NO* temp = raiz;
     bool encontrado = false;
     while (temp != NULL) {
@@ -127,7 +126,6 @@ void remover() {
         cout << "Elemento NAO encontrado na arvore.\n";
     }
 }
-
 
 void exibirQuantidade() {
     cout << "Quantidade de elementos: "
@@ -151,10 +149,9 @@ void buscar() {
 }
 
 // ---------- Criação e Balanceamento ----------
-
 NO* criaNO(int valor) {
     NO* novo = (NO*)malloc(sizeof(NO));
-    if (novo == NULL) return NULL;      // Falha de alocação
+    if (novo == NULL) return NULL; // Falha de alocação
 
     novo->valor = valor;
     novo->esq = NULL;
@@ -190,7 +187,8 @@ NO* girarDireita(NO* y) {
     y->altura = maior(alturaNo(y->esq), alturaNo(y->dir)) + 1;
     x->altura = maior(alturaNo(x->esq), alturaNo(x->dir)) + 1;
 
-    return x; // Retorna a nova raiz da subárvore
+    // Retorna o novo nó raiz
+    return x;
 }
 
 NO* girarEsquerda(NO* x)
@@ -198,7 +196,7 @@ NO* girarEsquerda(NO* x)
     NO* y = x->dir;
     NO* T2 = y->esq;
 
-    // Transfere T2 e atualiza ponteiros
+    // Atualiza ponteiros
     y->esq = x;
     x->dir = T2;
 
@@ -206,7 +204,8 @@ NO* girarEsquerda(NO* x)
     x->altura = maior(alturaNo(x->esq), alturaNo(x->dir)) + 1;
     y->altura = maior(alturaNo(y->esq), alturaNo(y->dir)) + 1;
 
-    return y; // Retorna a nova raiz da subárvore
+    // Retorna nova raiz
+    return y;
 }
 
 // Função auxiliar para balancear um nó AVL
@@ -214,21 +213,18 @@ NO* balancearNo(NO* no) {
     if (no == NULL) return no;
     int fb = fatorBalanceamento(no);
 
-    // Caso Esquerda-Esquerda (FB > 1 e FB(esq) >= 0)
+    // Caso Esquerda-Esquerda
     if (fb > 1 && fatorBalanceamento(no->esq) >= 0)
         return girarDireita(no);
-
-    // Caso Esquerda-Direita (FB > 1 e FB(esq) < 0)
+    // Caso Esquerda-Direita
     if (fb > 1 && fatorBalanceamento(no->esq) < 0) {
         no->esq = girarEsquerda(no->esq);
         return girarDireita(no);
     }
-
-    // Caso Direita-Direita (FB < -1 e FB(dir) <= 0)
+    // Caso Direita-Direita
     if (fb < -1 && fatorBalanceamento(no->dir) <= 0)
         return girarEsquerda(no);
-
-    // Caso Direita-Esquerda (FB < -1 e FB(dir) > 0)
+    // Caso Direita-Esquerda
     if (fb < -1 && fatorBalanceamento(no->dir) > 0) {
         no->dir = girarDireita(no->dir);
         return girarEsquerda(no);
@@ -237,7 +233,7 @@ NO* balancearNo(NO* no) {
 }
 
 NO* insereArvore(NO* no, int valor) {
-        /* Inserção binária normal */
+        /* Inserção binária normal ----------------------------- */
     if (no == NULL) {
         return criaNO(valor);
     }
@@ -251,33 +247,30 @@ NO* insereArvore(NO* no, int valor) {
                 /* Valor já existe – não insere duplicado */
         return no;
     }
-
-        /* Atualiza altura e balanceia (Retrocesso) */
+        /* Atualiza altura do nó */
     no->altura = maior(alturaNo(no->esq), alturaNo(no->dir)) + 1;
+        /* Balanceamento AVL usando função auxiliar */
     return balancearNo(no);
 }
 
 /* -----------------------------------------------------------
-    Funções de Remoção
+    Funções de Remoção (Completas)
 ----------------------------------------------------------- */
 
-// Função auxiliar para encontrar o menor valor (Sucessor)
 NO* menorValorNo(NO* no) {
     NO* atual = no;
-    // Percorre sempre para a esquerda para encontrar o menor valor
     while (atual != NULL && atual->esq != NULL)
         atual = atual->esq;
     return atual;
 }
 
-// Função principal de remoção em AVL
 NO* removerArvore(NO* no, int valor) {
-    // Passo 1: Busca recursiva (Caso Base)
+    // Busca recursiva do nó a ser removido (Caso Base)
     if (no == NULL) {
         return no;
     }
 
-    // Passo 2: Navega pela árvore
+    // Navega pela árvore
     if (valor < no->valor) {
         no->esq = removerArvore(no->esq, valor);
     }
@@ -285,12 +278,11 @@ NO* removerArvore(NO* no, int valor) {
         no->dir = removerArvore(no->dir, valor);
     }
     else {
-        // Passo 3: Nó encontrado! Aplicar os casos de remoção.
+        // Nó encontrado!
 
-        // ========== CASO 1 e CASO 2: Nó com zero ou um filho ==========
+        // CASO 1 e CASO 2: Nó com zero ou um filho
         if (no->esq == NULL || no->dir == NULL) {
 
-            // 'temp' será o único filho (se houver) ou NULL (se for folha)
             NO* temp = no->esq ? no->esq : no->dir;
 
             // Subcaso 1: Nó folha (sem filhos)
@@ -300,7 +292,6 @@ NO* removerArvore(NO* no, int valor) {
             }
             // Subcaso 2: Nó com um filho
             else {
-                // Copia o conteúdo do filho para o nó atual, o filho sobe de posição.
                 *no = *temp;
             }
 
@@ -308,15 +299,14 @@ NO* removerArvore(NO* no, int valor) {
 
         }
         else {
-            // ========== CASO 3: Nó com dois filhos ==========
+            // CASO 3: Nó com dois filhos
 
-            // Passo 3.1: Encontre o Sucessor 
             NO* sucessor = menorValorNo(no->dir);
 
-            // Passo 3.2: Copie o valor do sucessor para o nó atual
+            // Copia o valor do sucessor
             no->valor = sucessor->valor;
 
-            // Passo 3.3: Remova o sucessor de sua posição original (recursão aninhada)
+            // Remove o sucessor de sua posição original
             no->dir = removerArvore(no->dir, sucessor->valor);
         }
     }
@@ -324,10 +314,10 @@ NO* removerArvore(NO* no, int valor) {
     // Se o nó foi removido (no == NULL), retorna NULL
     if (no == NULL) return no;
 
-    // Passo 4: Atualiza altura do nó (Fase de Retrocesso)
+    // Atualiza altura do nó
     no->altura = maior(alturaNo(no->esq), alturaNo(no->dir)) + 1;
 
-    // Passo 5: Balanceia o nó se necessário (propriedade AVL)
+    // Balanceia o nó
     return balancearNo(no);
 }
 
